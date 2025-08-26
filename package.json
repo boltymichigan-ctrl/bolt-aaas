@@ -1,0 +1,31 @@
+{
+  "name": "yourauth-monorepo",
+  "version": "1.0.0",
+  "description": "YourAuth - Authentication-as-a-Service for indie developers",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:dashboard\" \"npm run dev:landing\"",
+    "dev:backend": "cd apps/backend && npm run dev",
+    "dev:dashboard": "cd apps/dashboard && npm run dev",
+    "dev:landing": "cd apps/landing && npm run dev",
+    "dev:example": "cd apps/example && npm run dev",
+    "build": "npm run build:backend && npm run build:dashboard && npm run build:landing && npm run build:sdk",
+    "build:backend": "cd apps/backend && npm run build",
+    "build:dashboard": "cd apps/dashboard && npm run build",
+    "build:landing": "cd apps/landing && npm run build",
+    "build:sdk": "cd packages/sdk && npm run build",
+    "test": "npm run test:backend && npm run test:sdk",
+    "test:backend": "cd apps/backend && npm test",
+    "test:sdk": "cd packages/sdk && npm test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
