@@ -1,6 +1,6 @@
-import { config as dotenvConfig } from 'dotenv';
+import dotenv from 'dotenv';
 
-dotenvConfig();
+dotenv.config();
 
 export const config = {
   port: process.env.PORT || 5000,
@@ -25,7 +25,7 @@ export const config = {
   
   // Email
   resend: {
-    apiKey: process.env.RESEND_API_KEY || 'abcdef', // Default API key provided
+    apiKey: process.env.RESEND_API_KEY || 'abcdef',
   },
   
   // Stripe (commented for free tier)
@@ -34,18 +34,6 @@ export const config = {
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     priceIds: {
       pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly',
-    }
-  },
-  
-  // Quotas
-  quotas: {
-    free: {
-      users: 100,
-      requests: 10000,
-    },
-    pro: {
-      users: 10000,
-      requests: 1000000,
     }
   },
   

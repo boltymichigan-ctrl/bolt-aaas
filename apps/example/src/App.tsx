@@ -1,6 +1,125 @@
 import React, { useState, useEffect } from 'react'
 import { Shield, User, LogOut, AlertCircle, CheckCircle, Code, Eye, EyeOff } from 'lucide-react'
-import { YourAuth, AuthUser, YourAuthError } from 'yourauth-js'
+
+// Mock YourAuth SDK for demo purposes
+interface AuthUser {
+  id: string
+  email: string
+  created_at: string
+}
+
+interface AuthResponse {
+  success: boolean
+  data?: {
+    user: AuthUser
+    tokens: {
+      accessToken: string
+      refreshToken: string
+    }
+  }
+  error?: string
+  message?: string
+}
+
+interface YourAuthError extends Error {
+  status?: number
+  code?: string
+}
+
+class YourAuth {
+  private apiKey: string
+  private baseURL: string
+
+  constructor(config: { apiKey: string; baseURL?: string }) {
+    this.apiKey = config.apiKey
+    this.baseURL = config.baseURL || 'http://localhost:5000/api'
+  }
+
+  async signup(email: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${this.baseURL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this.apiKey,
+      },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const data = await response.json()
+    if (!response.ok) {
+      const error = new Error(data.error || 'Signup failed') as YourAuthError
+      error.status = response.status
+      throw error
+    }
+    return data
+  }
+
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const response = await fetch(`${this.baseURL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this.apiKey,
+      },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const data = await response.json()
+    if (!response.ok) {
+      const error = new Error(data.error || 'Login failed') as YourAuthError
+      error.status = response.status
+      throw error
+    }
+    return data
+  }
+
+  async logout(userId?: string): Promise<{ success: boolean; message?: string }> {
+    const response = await fetch(`${this.baseURL}/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this.apiKey,
+      },
+      body: JSON.stringify({ userId }),
+    })
+
+    return await response.json()
+  }
+
+  async resetPassword(email: string): Promise<{ success: boolean; message?: string }> {
+    const response = await fetch(`${this.baseURL}/auth/reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this.apiKey,
+      },
+      body: JSON.stringify({ email }),
+    })
+
+    return await response.json()
+  }
+
+  getUser(token: string): AuthUser {
+    try {
+      const base64Url = token.split('.')[1]
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      const payload = JSON.parse(jsonPayload)
+      return {
+        id: payload.sub,
+        email: payload.email,
+        created_at: new Date(payload.iat * 1000).toISOString(),
+      }
+    } catch (error) {
+      throw new Error('Invalid JWT token')
+    }
+  }
+}
 
 // Initialize YourAuth SDK with demo API key
 const auth = new YourAuth({

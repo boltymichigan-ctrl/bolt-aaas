@@ -6,7 +6,17 @@ import { createDeveloper, getDeveloperByEmail, getDashboardStats, getRecentUsers
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import { authenticateDeveloper } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
-import { config } from '../config/config';
+
+const quotas = {
+  free: {
+    users: 100,
+    requests: 10000,
+  },
+  pro: {
+    users: 10000,
+    requests: 1000000,
+  }
+};
 
 const router = express.Router();
 
@@ -111,7 +121,7 @@ router.get('/dashboard', authenticateDeveloper, async (req: any, res, next) => {
     const stats = await getDashboardStats(developer.id);
     
     // Get quota info
-    const quotaLimit = config.quotas[developer.plan as keyof typeof config.quotas].users;
+    const quotaLimit = quotas[developer.plan as keyof typeof quotas].users;
 
     // Get recent data
     const recentUsers = await getRecentUsers(developer.id);

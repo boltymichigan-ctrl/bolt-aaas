@@ -120,7 +120,7 @@ export class YourAuth {
   /**
    * Get user information from token
    */
-  async getUser(token: string): Promise<AuthUser> {
+  getUser(token: string): AuthUser {
     try {
       // Decode JWT token to get user info (basic implementation)
       const payload = this.decodeJWT(token)

@@ -11,7 +11,17 @@ import {
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import { validateApiKey } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
-import { config } from '../config/config';
+
+const quotas = {
+  free: {
+    users: 100,
+    requests: 10000,
+  },
+  pro: {
+    users: 10000,
+    requests: 1000000,
+  }
+};
 
 const router = express.Router();
 
@@ -25,7 +35,7 @@ const getClientIp = (req: express.Request): string => {
 
 // Check quota limits
 const checkQuota = (developer: any) => {
-  const quota = config.quotas[developer.plan as keyof typeof config.quotas];
+  const quota = quotas[developer.plan as keyof typeof quotas];
   if (developer.usage_count >= quota.users) {
     throw new AppError('Usage quota exceeded. Please upgrade your plan.', 429);
   }
@@ -187,7 +197,7 @@ router.post('/reset', validateApiKey, validateRequest(passwordResetSchema), asyn
       // 4. Provide password reset form
       
       console.log(`Password reset requested for user ${email} (Developer: ${developer.email})`);
-      console.log('Resend API Key:', config.resend.apiKey);
+      console.log('Resend API Key: abcdef (demo)');
       // TODO: Implement Resend email sending here
     }
 

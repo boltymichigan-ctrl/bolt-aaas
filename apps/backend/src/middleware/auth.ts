@@ -1,7 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt';
 import { getDeveloperByApiKey, getDeveloperByEmail } from '../utils/database';
-import { JwtPayload } from '../types';
+
+interface JwtPayload {
+  sub: string;
+  dev: string;
+  email: string;
+  iat: number;
+  exp: number;
+  iss: string;
+  aud: string;
+}
 
 export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;

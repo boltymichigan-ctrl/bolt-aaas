@@ -3,7 +3,26 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { config } from '../config/config';
-import { JwtPayload, RefreshTokenPayload } from '../types';
+
+interface JwtPayload {
+  sub: string;
+  dev: string;
+  email: string;
+  iat: number;
+  exp: number;
+  iss: string;
+  aud: string;
+}
+
+interface RefreshTokenPayload {
+  sub: string;
+  dev: string;
+  type: 'refresh';
+  iat: number;
+  exp: number;
+  iss: string;
+  aud: string;
+}
 
 export function setupJwtKeys() {
   const keysDir = path.join(__dirname, '../../keys');
